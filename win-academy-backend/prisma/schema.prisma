@@ -1,0 +1,277 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ==================== ENUMS ====================
+
+enum UserRole {
+  LEARNER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum Sex {
+  M
+  F
+}
+
+enum EnrollmentStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum ContentType {
+  VIDEO
+  PDF
+  TEXT
+  IMAGE
+}
+
+// ==================== USER ====================
+// Représente toute personne ayant accès au système (apprenant ou administrateur)
+model User {
+  id             String      @id @default(uuid())
+  firstName      String
+  lastName       String
+  dateOfBirth    DateTime?
+  sex            Sex?
+  communeId      String?
+  email          String      @unique
+  passwordHash   String
+  role           UserRole    @default(LEARNER)
+  status         UserStatus  @default(ACTIVE)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  // Relations
+  commune        Commune?    @relation(fields: [communeId], references: [id])
+  enrollments    Enrollment[]
+  attempts       Attempt[]
+  certificates   Certificate[]
+
+  @@index([email])
+  @@map("users")
+}
+
+// ==================== DEPARTMENT ====================
+// Représente une division administrative nationale
+model Department {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  code      String?   @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  communes  Commune[]
+
+  @@map("departments")
+}
+
+// ==================== COMMUNE ====================
+// Sous-division administrative appartenant à un seul département
+model Commune {
+  id           String     @id @default(uuid())
+  name         String
+  departmentId String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relations
+  department   Department @relation(fields: [departmentId], references: [id])
+  users        User[]
+
+  @@unique([name, departmentId])
+  @@map("communes")
+}
+
+// ==================== CATEGORY ====================
+// Permet de classer les formations et contrôler l'accès par âge
+model Category {
+  id          String      @id @default(uuid())
+  name        String
+  description String?
+  image       String?
+  ageMin      Int         @default(0)
+  ageMax      Int         @default(999)
+  createdAt   DateTime    @default(now())
+
+  // Relations
+  formations  Formation[]
+
+  @@map("categories")
+}
+
+// ==================== FORMATION ====================
+// Représente un parcours pédagogique complet
+model Formation {
+  id              String        @id @default(uuid())
+  title           String
+  shortDescription String?
+  fullDescription String?
+  level           String?
+  duration        Int?
+  image           String?
+  categoryId      String?
+  createdAt       DateTime      @default(now())
+
+  // Relations
+  category        Category?     @relation(fields: [categoryId], references: [id])
+  modules         Module[]
+  evaluation      Evaluation?
+  enrollments     Enrollment[]
+  certificates    Certificate[]
+
+  @@map("formations")
+}
+
+// ==================== MODULE ====================
+// Subdivision pédagogique d'une formation
+model Module {
+  id           String     @id @default(uuid())
+  title        String
+  description  String?
+  order        Int
+  formationId  String
+  createdAt    DateTime   @default(now())
+
+  // Relations
+  formation    Formation  @relation(fields: [formationId], references: [id])
+  contents     Content[]
+
+  @@unique([order, formationId])
+  @@map("modules")
+}
+
+// ==================== CONTENT ====================
+// Élément pédagogique concret
+model Content {
+  id        String      @id @default(uuid())
+  type      ContentType
+  title     String
+  url       String?
+  body      String?     // Pour contenu TEXT stocké en base
+  order     Int
+  moduleId  String
+  createdAt DateTime    @default(now())
+
+  // Relations
+  module    Module      @relation(fields: [moduleId], references: [id])
+
+  @@unique([order, moduleId])
+  @@map("contents")
+}
+
+// ==================== ENROLLMENT ====================
+// Lien entre un User et une Formation
+model Enrollment {
+  id               String           @id @default(uuid())
+  userId           String
+  formationId      String
+  progressPercentage Int            @default(0)
+  status           EnrollmentStatus @default(IN_PROGRESS)
+  enrolledAt       DateTime        @default(now())
+
+  // Relations
+  user             User             @relation(fields: [userId], references: [id])
+  formation        Formation       @relation(fields: [formationId], references: [id])
+
+  @@unique([userId, formationId])
+  @@map("enrollments")
+}
+
+// ==================== EVALUATION ====================
+// Examen final d'une formation
+model Evaluation {
+  id           String     @id @default(uuid())
+  formationId  String     @unique
+  passingScore Int        @default(50)
+  maxAttempts  Int        @default(3)
+  timeLimit    Int?       // en minutes
+
+  // Relations
+  formation    Formation  @relation(fields: [formationId], references: [id])
+  questions    Question[]
+  attempts     Attempt[]
+
+  @@map("evaluations")
+}
+
+// ==================== QUESTION ====================
+// Question appartenant à une évaluation
+model Question {
+  id            String   @id @default(uuid())
+  evaluationId  String
+  questionText  String
+  createdAt     DateTime @default(now())
+
+  // Relations
+  evaluation    Evaluation @relation(fields: [evaluationId], references: [id])
+  answers       Answer[]
+
+  @@map("questions")
+}
+
+// ==================== ANSWER ====================
+// Réponse possible à une question
+model Answer {
+  id          String   @id @default(uuid())
+  questionId  String
+  answerText  String
+  isCorrect   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  // Relations
+  question    Question @relation(fields: [questionId], references: [id])
+
+  @@map("answers")
+}
+
+// ==================== ATTEMPT ====================
+// Tentative d'un utilisateur à une évaluation
+model Attempt {
+  id           String   @id @default(uuid())
+  userId       String
+  evaluationId String
+  score        Int      @default(0)
+  passed       Boolean  @default(false)
+  attemptNumber Int     @default(1)
+  createdAt    DateTime @default(now())
+
+  // Relations
+  user         User       @relation(fields: [userId], references: [id])
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
+
+  @@map("attempts")
+}
+
+// ==================== CERTIFICATE ====================
+// Certificat délivré après réussite
+model Certificate {
+  id           String   @id @default(uuid())
+  userId       String
+  formationId  String
+  uniqueCode   String   @unique
+  issuedAt     DateTime @default(now())
+  qrCodeUrl    String?
+
+  // Relations
+  user         User      @relation(fields: [userId], references: [id])
+  formation    Formation @relation(fields: [formationId], references: [id])
+
+  @@unique([userId, formationId])
+  @@map("certificates")
+}
