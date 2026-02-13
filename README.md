@@ -85,7 +85,7 @@ Créer une plateforme de formation en ligne :
 | Framework | NestJS 10.x |
 | Langage | TypeScript 5.x |
 | ORM | Prisma 5.x |
-| Base de Données | PostgreSQL 15.x |
+| Base de Données | MySQL 8.x |
 | Documentation API | Swagger/NestJS |
 | Authentification | JWT (Access + Refresh Token) |
 | Validation | class-validator + ValidationPipe |
@@ -569,7 +569,7 @@ win-academy-backend/
 
 ```env
 # Base de données
-DATABASE_URL=postgresql://user:password@localhost:5432/win_academy
+DATABASE_URL=mysql://user:password@localhost:3306/win_academy
 
 # Authentification
 JWT_SECRET=your-super-secret-key
@@ -592,7 +592,7 @@ FRONTEND_URL=http://localhost:3001
 ### Prérequis
 
 - Node.js 18+
-- PostgreSQL 15+
+- MySQL 8.x
 - npm ou yarn
 
 ### Installation
