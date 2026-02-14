@@ -15,6 +15,7 @@ import { ModulesModule } from './modules/modules.module';
 import { ContentsModule } from './contents/contents.module';
 import { EnrollmentsModule } from './enrollments/enrollments.module';
 import { EvaluationsModule } from './evaluations/evaluations.module';
+import { QuestionsModule } from './questions/questions.module';
 import { AttemptsModule } from './attempts/attempts.module';
 import { CertificatesModule } from './certificates/certificates.module';
 
@@ -41,6 +42,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
     ContentsModule,
     EnrollmentsModule,
     EvaluationsModule,
+    QuestionsModule,
     AttemptsModule,
     CertificatesModule,
   ],

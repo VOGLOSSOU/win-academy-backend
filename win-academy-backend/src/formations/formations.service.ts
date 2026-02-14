@@ -32,13 +32,46 @@ export class FormationsService {
   }
 
   async update(id: string, data: any) {
-    await this.findOne(id);
+    const formation = await this.findOne(id);
+
+    // RÈGLE MÉTIER: Modification restreinte si des utilisateurs sont déjà inscrits
+    const enrollmentCount = await this.prisma.enrollment.count({
+      where: { formationId: id },
+    });
+
+    if (enrollmentCount > 0) {
+      // On autorise uniquement certains champs (ex: image, description courte)
+      const allowedFields = ['shortDescription', 'image'];
+      const requestedFields = Object.keys(data);
+      const restrictedFields = requestedFields.filter(f => !allowedFields.includes(f));
+
+      if (restrictedFields.length > 0) {
+        throw new ConflictException(
+          `Impossible de modifier les champs [${restrictedFields.join(', ')}]: ${enrollmentCount} utilisateur(s) déjà inscrit(s). ` +
+          `Seuls les champs [${allowedFields.join(', ')}] peuvent être modifiés.`,
+        );
+      }
+    }
+
     return this.prisma.formation.update({ where: { id }, data });
   }
 
   async remove(id: string) {
-    await this.findOne(id);
+    const formation = await this.findOne(id);
+
+    // RÈGLE MÉTIER: Impossible de supprimer une formation si des utilisateurs sont inscrits
+    const enrollmentCount = await this.prisma.enrollment.count({
+      where: { formationId: id },
+    });
+
+    if (enrollmentCount > 0) {
+      throw new ConflictException(
+        `Impossible de supprimer la formation: ${enrollmentCount} utilisateur(s) déjà inscrit(s). ` +
+        `Veuillez d'abord désinscrire les utilisateurs ou archiver la formation.`,
+      );
+    }
+
     await this.prisma.formation.delete({ where: { id } });
-    return { message: 'Formation deleted' };
+    return { message: 'Formation supprimée avec succès' };
   }
 }
