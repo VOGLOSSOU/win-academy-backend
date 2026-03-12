@@ -33,9 +33,7 @@ export class AuthService {
         lastName: registerDto.lastName,
         email: registerDto.email,
         passwordHash: hashedPassword,
-        dateOfBirth: registerDto.dateOfBirth
-          ? new Date(registerDto.dateOfBirth)
-          : undefined,
+        dateOfBirth: new Date(registerDto.dateOfBirth),
         sex: registerDto.sex,
         communeId: registerDto.communeId,
       },

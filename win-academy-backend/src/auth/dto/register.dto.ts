@@ -3,11 +3,10 @@ import {
   IsEmail,
   MinLength,
   MaxLength,
-  IsOptional,
   IsEnum,
   IsDateString,
 } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Sex } from '@prisma/client';
 
 export class RegisterDto {
@@ -23,20 +22,17 @@ export class RegisterDto {
   @MaxLength(50)
   lastName: string;
 
-  @ApiPropertyOptional({ example: '1990-01-01' })
-  @IsOptional()
+  @ApiProperty({ example: '1990-01-01' })
   @IsDateString()
-  dateOfBirth?: string;
+  dateOfBirth: string;
 
-  @ApiPropertyOptional({ enum: Sex, example: 'M' })
-  @IsOptional()
+  @ApiProperty({ enum: Sex, example: 'M' })
   @IsEnum(Sex)
-  sex?: Sex;
+  sex: Sex;
 
-  @ApiPropertyOptional({ example: 'uuid-commune' })
-  @IsOptional()
+  @ApiProperty({ example: 'uuid-de-la-commune' })
   @IsString()
-  communeId?: string;
+  communeId: string;
 
   @ApiProperty({ example: 'john.doe@example.com' })
   @IsEmail()
