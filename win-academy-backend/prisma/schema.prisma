@@ -58,7 +58,7 @@ model User {
   updatedAt      DateTime    @updatedAt
 
   // Relations
-  commune        Commune?    @relation(fields: [communeId], references: [id], onDelete: SetNull)
+  commune        Commune?    @relation(fields: [communeId], references: [id])
   enrollments    Enrollment[]
   attempts       Attempt[]
   certificates   Certificate[]
