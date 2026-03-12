@@ -49,6 +49,8 @@ async function bootstrap() {
     .setTitle('Win Academy API')
     .setDescription('API REST pour la plateforme de formation Win Academy')
     .setVersion('1.0')
+    .addServer('https://win-academy-backend.onrender.com', 'Production')
+    .addServer('http://localhost:3000', 'Local')
     .addBearerAuth(
       {
         type: 'http',
