@@ -39,8 +39,7 @@ export class UsersController {
   }
 
   @Get()
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
-  @ApiOperation({ summary: 'Get all users (Admin only)' })
+  @ApiOperation({ summary: 'Get all users' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'List of users' })

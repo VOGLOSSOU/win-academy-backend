@@ -57,14 +57,18 @@ export class EnrollmentsService {
 
   async findAll(page = 1, limit = 10) {
     const skip = (page - 1) * limit;
-    const [data, total] = await Promise.all([
-      this.prisma.enrollment.findMany({ 
-        skip, 
-        take: limit, 
-        include: { user: true, formation: true } 
+    const [enrollments, total] = await Promise.all([
+      this.prisma.enrollment.findMany({
+        skip,
+        take: limit,
+        include: { user: true, formation: true }
       }),
       this.prisma.enrollment.count(),
     ]);
+    const data = enrollments.map(({ user, ...enrollment }) => {
+      const { passwordHash, ...safeUser } = user;
+      return { ...enrollment, user: safeUser };
+    });
     return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 

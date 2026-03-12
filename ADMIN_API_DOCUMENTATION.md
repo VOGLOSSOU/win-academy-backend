@@ -10,6 +10,166 @@ Authorization: Bearer <accessToken>
 
 ---
 
+## Utilisateurs
+
+### GET `/users` — Liste des utilisateurs
+**Accès :** Authentifié (token valide requis, pas de restriction de rôle) | **Status :** ✅
+
+**Query params :**
+| Param | Type | Défaut | Description |
+|-------|------|--------|-------------|
+| page | number | 1 | |
+| limit | number | 10 | |
+
+**Réponse 200 :**
+```json
+{
+  "data": [
+    {
+      "id": "e057f4b7-ba5b-4440-8e8b-d51464c7ae",
+      "firstName": "Nathan",
+      "lastName": "Voglossou",
+      "dateOfBirth": "2004-07-16T00:00:00.000Z",
+      "sex": "M",
+      "communeId": "5a2b8663-1dee-11f1-9f08-bc111e65a1f8",
+      "email": "n969601@gmail.com",
+      "role": "LEARNER",
+      "status": "ACTIVE",
+      "createdAt": "2026-03-12T10:00:00.000Z",
+      "updatedAt": "2026-03-12T10:00:00.000Z",
+      "commune": {
+        "id": "5a2b8663-1dee-11f1-9f08-bc111e65a1f8",
+        "name": "Cotonou",
+        "departmentId": "...",
+        "department": { "id": "...", "name": "Littoral", "code": "LIT" }
+      }
+    }
+  ],
+  "meta": { "total": 1, "page": 1, "limit": 10, "totalPages": 1 }
+}
+```
+
+> Le champ `passwordHash` n'est jamais retourné.
+
+**Erreurs :**
+- `401` — Token absent ou invalide
+
+---
+
+## Départements
+
+### GET `/departments` — Liste des départements
+**Accès :** Public (aucun token requis) | **Status :** ✅
+
+**Query params :** `page`, `limit`
+
+**Réponse 200 :**
+```json
+{
+  "data": [
+    {
+      "id": "db390482-1dec-11f1-9f08-bc111e65a1f8",
+      "name": "Alibori",
+      "code": "ALI",
+      "createdAt": "2026-03-12T10:00:00.000Z",
+      "updatedAt": "2026-03-12T10:00:00.000Z"
+    }
+  ],
+  "meta": { "total": 12, "page": 1, "limit": 10, "totalPages": 2 }
+}
+```
+
+> Les 12 départements du Bénin sont déjà en base. Aucune route de création/modification n'est nécessaire.
+
+---
+
+### GET `/departments/:id` — Un département par ID
+**Accès :** Public | **Status :** ✅
+
+**Réponse 200 :** objet département avec ses communes incluses
+
+---
+
+## Communes
+
+### GET `/communes` — Liste des communes
+**Accès :** Public (aucun token requis) | **Status :** ✅
+
+**Query params :** `page`, `limit`
+
+**Réponse 200 :**
+```json
+{
+  "data": [
+    {
+      "id": "5a2b8663-1dee-11f1-9f08-bc111e65a1f8",
+      "name": "Cotonou",
+      "departmentId": "db390482-1dec-11f1-9f08-bc111e65a1f8",
+      "createdAt": "2026-03-12T10:00:00.000Z",
+      "updatedAt": "2026-03-12T10:00:00.000Z",
+      "department": { "id": "...", "name": "Littoral", "code": "LIT" }
+    }
+  ],
+  "meta": { "total": 77, "page": 1, "limit": 10, "totalPages": 8 }
+}
+```
+
+> Les 77 communes du Bénin sont déjà en base. Aucune route de création/modification n'est nécessaire.
+
+---
+
+### GET `/communes/:id` — Une commune par ID
+**Accès :** Public | **Status :** ✅
+
+**Réponse 200 :** objet commune avec son département inclus
+
+---
+
+## Inscriptions
+
+### GET `/enrollments` — Liste de toutes les inscriptions
+**Accès :** Authentifié (token valide requis, pas de restriction de rôle) | **Status :** ✅
+
+**Query params :** `page`, `limit`
+
+**Réponse 200 :**
+```json
+{
+  "data": [
+    {
+      "id": "uuid-enrollment",
+      "userId": "uuid-user",
+      "formationId": "uuid-formation",
+      "progressPercentage": 50,
+      "status": "IN_PROGRESS",
+      "enrolledAt": "2026-03-12T10:00:00.000Z",
+      "user": {
+        "id": "uuid-user",
+        "firstName": "Nathan",
+        "lastName": "Voglossou",
+        "email": "n969601@gmail.com",
+        "role": "LEARNER",
+        "status": "ACTIVE"
+      },
+      "formation": {
+        "id": "uuid-formation",
+        "title": "Algèbre",
+        "level": "DEBUTANT",
+        "duration": 120
+      }
+    }
+  ],
+  "meta": { "total": 1, "page": 1, "limit": 10, "totalPages": 1 }
+}
+```
+
+> `status` peut valoir `IN_PROGRESS` ou `COMPLETED`. Le `passwordHash` de l'utilisateur n'est jamais retourné.
+
+**Erreurs :**
+- `401` — Token absent ou invalide
+
+---
+
 ## Auth Admin
 
 ### POST `/auth/login` — Connexion Super Admin
@@ -568,6 +728,50 @@ Authorization: Bearer <accessToken>
 ---
 
 ## Évaluations
+
+### GET `/evaluations` — Liste de toutes les évaluations
+**Accès :** ADMIN / SUPER_ADMIN | **Status :** ✅
+
+**Query params :** `page`, `limit`
+
+**Réponse 200 :**
+```json
+{
+  "data": [
+    {
+      "id": "3669f89a-bb4d-498e-b003-0dd293101306",
+      "formationId": "13bb8785-4f5b-4dab-a6a5-dc03bdc95d74",
+      "passingScore": 70,
+      "maxAttempts": 3,
+      "timeLimit": 30,
+      "formation": {
+        "id": "13bb8785-4f5b-4dab-a6a5-dc03bdc95d74",
+        "title": "Algèbre de base",
+        "level": "DEBUTANT"
+      },
+      "questions": [
+        {
+          "id": "449ad326-7d2c-44cc-aa6a-3b7f440458b0",
+          "questionText": "Quelle est la solution de 2x = 4 ?",
+          "answers": [
+            { "id": "...", "answerText": "x = 2", "isCorrect": true },
+            { "id": "...", "answerText": "x = 1", "isCorrect": false }
+          ]
+        }
+      ]
+    }
+  ],
+  "meta": { "total": 5, "page": 1, "limit": 10, "totalPages": 1 }
+}
+```
+
+> Évite le problème N+1 : une seule requête pour toutes les évaluations avec questions et réponses.
+
+**Erreurs :**
+- `401` — Token absent ou invalide
+- `403` — Rôle insuffisant
+
+---
 
 ### POST `/evaluations` — Créer l'évaluation d'une formation
 **Accès :** ADMIN / SUPER_ADMIN | **Status :** ✅ 201 Created

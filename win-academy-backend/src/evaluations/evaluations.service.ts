@@ -12,7 +12,7 @@ export class EvaluationsService {
   async findAll(page = 1, limit = 10) {
     const skip = (page - 1) * limit;
     const [data, total] = await Promise.all([
-      this.prisma.evaluation.findMany({ skip, take: limit, include: { formation: true, questions: true } }),
+      this.prisma.evaluation.findMany({ skip, take: limit, include: { formation: true, questions: { include: { answers: true } } } }),
       this.prisma.evaluation.count(),
     ]);
     return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };

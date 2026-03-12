@@ -19,6 +19,9 @@ export class EvaluationsController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
     return this.evaluationsService.findAll(+page, +limit);
   }
