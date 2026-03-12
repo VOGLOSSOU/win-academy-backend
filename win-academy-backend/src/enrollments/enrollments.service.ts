@@ -1,15 +1,47 @@
 import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { calculateAge, isAgeInRange } from '../common/utils/age.utils';
 
 @Injectable()
 export class EnrollmentsService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: { userId: string; formationId: string }) {
+    // Vérifier si déjà inscrit
     const existing = await this.prisma.enrollment.findUnique({
       where: { userId_formationId: { userId: data.userId, formationId: data.formationId } },
     });
     if (existing) throw new ConflictException('Déjà inscrit à cette formation');
+    
+    // Récupérer la formation avec sa catégorie
+    const formation = await this.prisma.formation.findUnique({
+      where: { id: data.formationId },
+      include: { category: true },
+    });
+    
+    if (!formation) {
+      throw new NotFoundException('Formation non trouvée');
+    }
+    
+    // RÈGLE MÉTIER: Vérifier l'âge de l'utilisateur
+    // L'âge du learner doit être compris entre ageMin et ageMax de la catégorie
+    if (formation.category) {
+      const user = await this.prisma.user.findUnique({
+        where: { id: data.userId },
+      });
+      
+      if (user && user.dateOfBirth) {
+        const userAge = calculateAge(user.dateOfBirth);
+        
+        if (userAge !== null && !isAgeInRange(userAge, formation.category.ageMin, formation.category.ageMax)) {
+          throw new BadRequestException(
+            `Vous n'avez pas l'âge requis pour cette formation. ` +
+            `Age requis: ${formation.category.ageMin}-${formation.category.ageMax} ans, ` +
+            `Votre âge: ${userAge} ans`
+          );
+        }
+      }
+    }
     
     // Créer l'inscription avec progression à 0
     return this.prisma.enrollment.create({ 
