@@ -71,8 +71,33 @@ export class CategoriesService {
   }
 
   async remove(id: string) {
-    await this.findOne(id);
+    const category = await this.findOne(id);
+
+    // SUPPRESSION EN CASCADE : Supprimer toutes les formations liées à cette catégorie
+    // d'abord les formations (ce qui supprimera aussi modules, contents, enrollments, evaluations, etc.)
+    const formationsCount = category.formations.length;
+    
+    if (formationsCount > 0) {
+      // Supprimer les formations (avec leurs modules, contenus, etc.)
+      for (const formation of category.formations) {
+        // Supprimer les enrollments
+        await this.prisma.enrollment.deleteMany({ where: { formationId: formation.id } });
+        // Supprimer les certificates  
+        await this.prisma.certificate.deleteMany({ where: { formationId: formation.id } });
+        // Supprimer les évaluations (avec questions et attempts)
+        await this.prisma.evaluation.deleteMany({ where: { formationId: formation.id } });
+        // Supprimer les modules (avec leurs contenus)
+        await this.prisma.module.deleteMany({ where: { formationId: formation.id } });
+        // Supprimer la formation
+        await this.prisma.formation.delete({ where: { id: formation.id } });
+      }
+    }
+
+    // Supprimer la catégorie
     await this.prisma.category.delete({ where: { id } });
-    return { message: 'Catégorie supprimée' };
+    
+    return { 
+      message: `Catégorie supprimée avec succès. ${formationsCount} formation(s) et ses données associées supprimée(s).` 
+    };
   }
 }

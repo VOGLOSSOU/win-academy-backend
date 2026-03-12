@@ -58,7 +58,7 @@ model User {
   updatedAt      DateTime    @updatedAt
 
   // Relations
-  commune        Commune?    @relation(fields: [communeId], references: [id])
+  commune        Commune?    @relation(fields: [communeId], references: [id], onDelete: SetNull)
   enrollments    Enrollment[]
   attempts       Attempt[]
   certificates   Certificate[]
@@ -130,7 +130,7 @@ model Formation {
   createdAt       DateTime      @default(now())
 
   // Relations
-  category        Category?     @relation(fields: [categoryId], references: [id])
+  category        Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   modules         Module[]
   evaluation      Evaluation?
   enrollments     Enrollment[]

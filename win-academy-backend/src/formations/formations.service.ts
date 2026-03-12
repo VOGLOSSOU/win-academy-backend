@@ -67,21 +67,54 @@ export class FormationsService {
   }
 
   async remove(id: string) {
-    const formation = await this.findOne(id);
-
-    // RÈGLE MÉTIER: Impossible de supprimer une formation si des utilisateurs sont inscrits
-    const enrollmentCount = await this.prisma.enrollment.count({
-      where: { formationId: id },
+    // Récupérer la formation avec ses relations
+    const formation = await this.prisma.formation.findUnique({
+      where: { id },
+      include: { 
+        modules: { include: { contents: true } },
+        evaluation: { include: { questions: { include: { answers: true } }, attempts: true } },
+        enrollments: true,
+        certificates: true
+      }
     });
 
-    if (enrollmentCount > 0) {
-      throw new ConflictException(
-        `Impossible de supprimer la formation: ${enrollmentCount} utilisateur(s) déjà inscrit(s). ` +
-        `Veuillez d'abord désinscrire les utilisateurs ou archiver la formation.`,
-      );
+    if (!formation) {
+      throw new NotFoundException(`Formation ${id} non trouvée`);
     }
 
+    // SUPPRESSION EN CASCADE : Supprimer toutes les données liées
+    
+    // 1. Supprimer les enrollments
+    if (formation.enrollments.length > 0) {
+      await this.prisma.enrollment.deleteMany({ where: { formationId: id } });
+    }
+
+    // 2. Supprimer les certificates
+    if (formation.certificates.length > 0) {
+      await this.prisma.certificate.deleteMany({ where: { formationId: id } });
+    }
+
+    // 3. Supprimer les attempts liés à l'évaluation
+    if (formation.evaluation) {
+      await this.prisma.attempt.deleteMany({ where: { evaluationId: formation.evaluation.id } });
+      // Supprimer les questions et leurs réponses
+      await this.prisma.answer.deleteMany({
+        where: { question: { evaluationId: formation.evaluation.id } }
+      });
+      await this.prisma.question.deleteMany({ where: { evaluationId: formation.evaluation.id } });
+      // Supprimer l'évaluation
+      await this.prisma.evaluation.delete({ where: { id: formation.evaluation.id } });
+    }
+
+    // 4. Supprimer les contenus et modules
+    for (const module of formation.modules) {
+      await this.prisma.content.deleteMany({ where: { moduleId: module.id } });
+    }
+    await this.prisma.module.deleteMany({ where: { formationId: id } });
+
+    // 5. Supprimer la formation
     await this.prisma.formation.delete({ where: { id } });
-    return { message: 'Formation supprimée avec succès' };
+    
+    return { message: 'Formation et toutes ses données associées supprimées avec succès' };
   }
 }
