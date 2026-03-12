@@ -7,12 +7,12 @@ import { Roles, UserRole } from '../common/decorators/roles.decorator';
 
 @ApiTags('Formations')
 @Controller('formations')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
 export class FormationsController {
   constructor(private readonly formationsService: FormationsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   create(@Body() data: any) {
     return this.formationsService.create(data);
@@ -28,13 +28,22 @@ export class FormationsController {
     return this.formationsService.findOne(id);
   }
 
+  @Get(':id/modules')
+  findModules(@Param('id') id: string) {
+    return this.formationsService.findModules(id);
+  }
+
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   update(@Param('id') id: string, @Body() data: any) {
     return this.formationsService.update(id, data);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.SUPER_ADMIN)
   remove(@Param('id') id: string) {
     return this.formationsService.remove(id);

@@ -56,6 +56,16 @@ export class FormationsService {
     return this.prisma.formation.update({ where: { id }, data });
   }
 
+  async findModules(id: string) {
+    const formation = await this.prisma.formation.findUnique({ where: { id } });
+    if (!formation) throw new NotFoundException(`Formation ${id} not found`);
+    return this.prisma.module.findMany({
+      where: { formationId: id },
+      include: { contents: true },
+      orderBy: { order: 'asc' },
+    });
+  }
+
   async remove(id: string) {
     const formation = await this.findOne(id);
 

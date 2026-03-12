@@ -7,12 +7,12 @@ import { Roles, UserRole } from '../common/decorators/roles.decorator';
 
 @ApiTags('Modules')
 @Controller('modules')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
 export class ModulesController {
   constructor(private readonly modulesService: ModulesService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   create(@Body() data: any) {
     return this.modulesService.create(data);
@@ -29,12 +29,16 @@ export class ModulesController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   update(@Param('id') id: string, @Body() data: any) {
     return this.modulesService.update(id, data);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.SUPER_ADMIN)
   remove(@Param('id') id: string) {
     return this.modulesService.remove(id);

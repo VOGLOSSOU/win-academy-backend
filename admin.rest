@@ -1,0 +1,304 @@
+# WIN ACADEMY — Test API (Flux Admin / Super Admin)
+# Base URL: changer @host selon l'environnement
+
+@host = http://localhost:3000
+# @host = https://win-academy-backend.onrender.com
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjZGM1M2JmMC0xZTAxLTExZjEtOWYwOC1iYzExMWU2NWExZjgiLCJlbWFpbCI6Indha2VvZXV2cm9uc2Vuc2VtYmxlQGdtYWlsLmNvbSIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc3MzMxNzAwMSwiZXhwIjoxNzczMzIwNjAxfQ.aPMAQLP8ASGYUMkiAgGRGDPhbpsTJFbpUYGWqtGIWl4
+
+# ===========================
+# AUTH ADMIN
+# ===========================
+
+### Connexion Super Admin
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "wakeoeuvronsensemble@gmail.com",
+  "password": "wurami@dmin16"
+}
+
+###
+
+### Profil Super Admin connecté
+GET {{host}}/auth/me
+Authorization: Bearer {{token}}
+
+###
+
+# ===========================
+# CATEGORIES
+# ===========================
+
+### Créer une catégorie
+POST {{host}}/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Mathématiques A",
+  "description": "Cours  pour tous niveaux",
+  "image": null,
+  "ageMin": 6,
+  "ageMax": 18
+}
+
+###
+
+### Liste des catégories
+GET {{host}}/categories?page=1&limit=10
+
+###
+
+### Une catégorie par ID
+GET {{host}}/categories/09d7f4f5-8e62-4982-87e5-d75fbc89a1fb
+
+###
+
+### Modifier une catégorie
+PATCH {{host}}/categories/09d7f4f5-8e62-4982-87e5-d75fbc89a1fb
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Mathématiques avancées",
+  "ageMax": 20
+}
+
+###
+
+### Supprimer une catégorie
+DELETE {{host}}/categories/09d7f4f5-8e62-4982-87e5-d75fbc89a1fb
+Authorization: Bearer {{token}}
+
+###
+
+# ===========================
+# FORMATIONS
+# ===========================
+
+### Créer une formation
+POST {{host}}/formations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Algèbre",
+  "shortDescription": "Algèbre pour débutants",
+  "fullDescription": "Ce cours couvre les équations du premier et second degré",
+  "level": "DEBUTANT",
+  "duration": 120,
+  "image": null,
+  "categoryId": "4e243ac7-03a4-4872-83e4-9ac38ae53183"
+}
+
+###
+
+### Liste des formations
+GET {{host}}/formations?page=1&limit=10
+
+###
+
+### Une formation par ID (avec ses modules)
+GET {{host}}/formations/13bb8785-4f5b-4dab-a6a5-dc03bdc95d74
+
+###
+
+### Modifier une formation
+PATCH {{host}}/formations/13bb8785-4f5b-4dab-a6a5-dc03bdc95d74
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Algèbre pour débutants",
+  "level": "INTERMEDIAIRE"
+}
+
+###
+
+### Supprimer une formation
+DELETE {{host}}/formations/261f28da-ae7d-4cbe-aca6-fb1f131c900e
+Authorization: Bearer {{token}}
+
+###
+
+# ===========================
+# MODULES
+# ===========================
+
+### Créer un module dans une formation
+POST {{host}}/modules
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Chapitre 2 : Les équations évoluées",
+  "description": "Résolution d'équations du premier degré",
+  "order": 2,
+  "formationId": "13bb8785-4f5b-4dab-a6a5-dc03bdc95d74"
+}
+
+###
+
+### Liste des modules d'une formation
+GET {{host}}/formations/13bb8785-4f5b-4dab-a6a5-dc03bdc95d74/modules
+
+###
+
+### Un module par ID
+GET {{host}}/modules/47717d2e-3cd1-43b6-8945-78791e097e29
+
+###
+
+
+### Modifier un module
+PATCH {{host}}/modules/47717d2e-3cd1-43b6-8945-78791e097e29
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Chapitre 2 modifié",
+  "order": 2
+}
+
+###
+
+### Supprimer un module
+DELETE {{host}}/modules/47717d2e-3cd1-43b6-8945-78791e097e29
+Authorization: Bearer {{token}}
+
+###
+
+# ===========================
+# CONTENUS
+# ===========================
+
+### Ajouter un contenu vidéo à un module
+POST {{host}}/contents
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "VIDEO",
+  "title": "Introduction aux équations",
+  "url": "https://youtube.com/watch?v=XXXXX",
+  "order": 1,
+  "moduleId": "4a47bc79-0dd8-458f-b35d-062ce076311a"
+}
+
+###
+
+### Ajouter un contenu PDF à un module
+POST {{host}}/contents
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "PDF",
+  "title": "Fiche de révision équations",
+  "url": "https://example.com/fichier.pdf",
+  "order": 2,
+  "moduleId": "4a47bc79-0dd8-458f-b35d-062ce076311a"
+}
+
+###
+
+### Ajouter un contenu texte à un module
+POST {{host}}/contents
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "TEXT",
+  "title": "Résumé du chapitre",
+  "body": "Une équation du premier degré est de la forme ax + b = 0...",
+  "order": 3,
+  "moduleId": "4a47bc79-0dd8-458f-b35d-062ce076311a"
+}
+
+###
+
+### Un contenu par ID
+GET {{host}}/contents/2a6fb83a-4744-4afe-9ec5-eb3c59eee46c
+Authorization: Bearer {{token}}
+
+###
+
+### Modifier un contenu
+PATCH {{host}}/contents/2a6fb83a-4744-4afe-9ec5-eb3c59eee46c
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Introduction aux équations - version 2",
+  "url": "https://youtube.com/watch?v=YYYYY"
+}
+
+###
+
+### Supprimer un contenu
+DELETE {{host}}/contents/2a6fb83a-4744-4afe-9ec5-eb3c59eee46c
+Authorization: Bearer {{token}}
+
+###
+
+# ===========================
+# EVALUATIONS
+# ===========================
+
+### Créer l'évaluation finale d'une formation
+POST {{host}}/evaluations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "formationId": "13bb8785-4f5b-4dab-a6a5-dc03bdc95d74",
+  "passingScore": 70,
+  "maxAttempts": 3,
+  "timeLimit": 30
+}
+
+###
+
+### Une évaluation par ID (avec ses questions)
+GET {{host}}/evaluations/3669f89a-bb4d-498e-b003-0dd293101306
+Authorization: Bearer {{token}}
+
+###
+
+# ===========================
+# QUESTIONS & REPONSES
+# ===========================
+
+### Ajouter une question avec ses réponses
+POST {{host}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "evaluationId": "3669f89a-bb4d-498e-b003-0dd293101306",
+  "questionText": "Quelle est la solution de 2x = 44 ?",
+  "answers": [
+    { "answerText": "x = 42", "isCorrect": false },
+    { "answerText": "x = 22", "isCorrect": true }
+  ]
+}
+
+###
+
+### Modifier une question
+PATCH {{host}}/questions/449ad326-7d2c-44cc-aa6a-3b7f440458b0
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "questionText": "Quelle est la valeur de x si 2x = 4 ?"
+}
+
+###
+
+### Supprimer une question
+DELETE {{host}}/questions/e758d0f0-1d2a-4a6e-8f99-bb1c751b8e91
+Authorization: Bearer {{token}}
+
+###
