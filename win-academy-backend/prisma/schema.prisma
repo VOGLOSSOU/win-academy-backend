@@ -125,6 +125,7 @@ model Formation {
   fullDescription String?
   level           String?
   duration        Int?
+  price           Float         @default(0)
   image           String?
   categoryId      String?
   createdAt       DateTime      @default(now())

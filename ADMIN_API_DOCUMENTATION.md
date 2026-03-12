@@ -343,6 +343,7 @@ Authorization: Bearer <accessToken>
   "fullDescription": "Ce cours couvre les équations du premier et second degré",
   "level": "DEBUTANT",
   "duration": 120,
+  "price": 5000,
   "image": null,
   "categoryId": "4e243ac7-03a4-4872-83e4-9ac38ae53183"
 }
@@ -356,6 +357,7 @@ Authorization: Bearer <accessToken>
 | fullDescription | string | - | Description complète |
 | level | string | - | Ex: `DEBUTANT`, `INTERMEDIAIRE`, `AVANCE` |
 | duration | number | - | Durée en minutes |
+| price | number | - | Prix en FCFA. `0` = gratuit (défaut). Ex: `5000` = 5 000 FCFA |
 | image | string | - | URL de l'image |
 | categoryId | string | - | UUID de la catégorie |
 
@@ -368,6 +370,7 @@ Authorization: Bearer <accessToken>
   "fullDescription": "Ce cours couvre les équations du premier et second degré",
   "level": "DEBUTANT",
   "duration": 120,
+  "price": 5000,
   "image": null,
   "categoryId": "4e243ac7-03a4-4872-83e4-9ac38ae53183",
   "createdAt": "2026-03-12T11:14:39.202Z"
@@ -390,6 +393,7 @@ Authorization: Bearer <accessToken>
       "fullDescription": "Ce cours couvre les équations du premier et second degré",
       "level": "DEBUTANT",
       "duration": 120,
+      "price": 5000,
       "image": null,
       "categoryId": "4e243ac7-03a4-4872-83e4-9ac38ae53183",
       "createdAt": "2026-03-12T11:14:39.202Z",
@@ -401,6 +405,8 @@ Authorization: Bearer <accessToken>
   "meta": { "total": 1, "page": 1, "limit": 10, "totalPages": 1 }
 }
 ```
+
+> `price: 0` = formation gratuite. Afficher "Gratuit" côté front quand `price === 0`.
 
 ---
 
@@ -416,6 +422,7 @@ Authorization: Bearer <accessToken>
   "fullDescription": "Ce cours couvre les équations du premier et second degré",
   "level": "DEBUTANT",
   "duration": 120,
+  "price": 5000,
   "image": null,
   "categoryId": "4e243ac7-03a4-4872-83e4-9ac38ae53183",
   "createdAt": "2026-03-12T11:14:39.202Z",
@@ -446,7 +453,7 @@ Authorization: Bearer <accessToken>
 **Réponse 200 :** la formation mise à jour (même structure que GET)
 
 **Erreurs :**
-- `409` — Des apprenants sont inscrits, modification des champs structurels impossible (seuls `shortDescription` et `image` sont modifiables)
+- `409` — Des apprenants sont inscrits, modification des champs structurels impossible (seuls `shortDescription`, `image` et `price` sont modifiables)
 - `404` — Formation introuvable
 
 ---

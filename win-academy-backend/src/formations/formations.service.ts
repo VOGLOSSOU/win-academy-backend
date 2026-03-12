@@ -41,7 +41,7 @@ export class FormationsService {
 
     if (enrollmentCount > 0) {
       // On autorise uniquement certains champs (ex: image, description courte)
-      const allowedFields = ['shortDescription', 'image'];
+      const allowedFields = ['shortDescription', 'image', 'price'];
       const requestedFields = Object.keys(data);
       const restrictedFields = requestedFields.filter(f => !allowedFields.includes(f));
 
