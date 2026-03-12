@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_FILTER } from '@nestjs/core';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 // Modules
 import { PrismaModule } from './prisma/prisma.module';
@@ -23,6 +25,7 @@ import { CertificatesModule } from './certificates/certificates.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 @Module({
+  controllers: [AppController],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
@@ -47,6 +50,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
     CertificatesModule,
   ],
   providers: [
+    AppService,
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
