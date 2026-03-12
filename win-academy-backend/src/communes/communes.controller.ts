@@ -7,12 +7,12 @@ import { Roles, UserRole } from '../common/decorators/roles.decorator';
 
 @ApiTags('Communes')
 @Controller('communes')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
 export class CommunesController {
   constructor(private readonly communesService: CommunesService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   create(@Body() data: { name: string; departmentId: string }) {
     return this.communesService.create(data);
@@ -29,12 +29,16 @@ export class CommunesController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   update(@Param('id') id: string, @Body() data: { name?: string; departmentId?: string }) {
     return this.communesService.update(id, data);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.SUPER_ADMIN)
   remove(@Param('id') id: string) {
     return this.communesService.remove(id);

@@ -23,20 +23,17 @@ export class CreateUserDto {
   @MaxLength(50)
   lastName: string;
 
-  @ApiPropertyOptional({ example: '1990-01-01' })
-  @IsOptional()
+  @ApiProperty({ example: '1990-01-01' })
   @IsDateString()
-  dateOfBirth?: string;
+  dateOfBirth: string;
 
-  @ApiPropertyOptional({ enum: Sex, example: 'M' })
-  @IsOptional()
+  @ApiProperty({ enum: Sex, example: 'M' })
   @IsEnum(Sex)
-  sex?: Sex;
+  sex: Sex;
 
-  @ApiPropertyOptional({ example: 'uuid-commune' })
-  @IsOptional()
+  @ApiProperty({ example: 'uuid-commune' })
   @IsString()
-  communeId?: string;
+  communeId: string;
 
   @ApiProperty({ example: 'john.doe@example.com' })
   @IsEmail()

@@ -1,0 +1,240 @@
+# WIN ACADEMY — Test API
+# Base URL: changer @host selon l'environnement
+
+@host = http://localhost:3000
+# @host = https://win-academy-backend.onrender.com
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlMDU3ZjRiNy1iYTViLTQ0NDAtOGU4Yi1kNTE0NjE0NGM3YWUiLCJlbWFpbCI6Im45Njk2MDFAZ21haWwuY29tIiwicm9sZSI6IkxFQVJORVIiLCJpYXQiOjE3NzMzMDY4NDYsImV4cCI6MTc3MzMxMDQ0Nn0.KQtbArvd-JkWawIUISUGVmybA0T5K2Rx4-n07wX0KUc
+
+# ===========================
+# AUTH
+# ===========================
+
+### Inscription
+POST {{host}}/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Nathan",
+  "lastName": "Voglossou",
+  "dateOfBirth": "2004-07-16",
+  "sex": "M",
+  "communeId": "5a2b8663-1dee-11f1-9f08-bc111e65a1f8",
+  "email": "n969601@gmail.com",
+  "password": "N@than16"
+}
+
+###
+
+### Connexion
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "n969601@gmail.com",
+  "password": "N@than16"
+}
+
+###
+
+### Profil utilisateur connecté
+GET {{host}}/auth/me
+Authorization: Bearer {{token}}
+
+###
+
+### Rafraîchir le token
+POST {{host}}/auth/refresh
+Authorization: Bearer {{token}}
+
+###
+
+# ===========================
+# DEPARTMENTS
+# ===========================
+
+### Liste des départements
+GET {{host}}/departments?page=1&limit=20
+
+###
+
+### Un département par ID
+GET {{host}}/departments/db390482-1dec-11f1-9f08-bc111e65a1f8
+
+###
+
+# ===========================
+# COMMUNES
+# ===========================
+
+### Liste des communes
+GET {{host}}/communes?page=1&limit=20
+
+###
+
+### Un commune par ID
+GET {{host}}/communes/5a2b7e7b-1dee-11f1-9f08-bc111e65a1f8
+
+###
+
+# ===========================
+# CATEGORIES
+# ===========================
+
+### Liste des catégories (public)
+GET {{host}}/categories?page=1&limit=10
+
+###
+
+### Créer une catégorie (admin)
+POST {{host}}/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Mathématiques",
+  "description": "Cours de mathématiques pour enfants",
+  "minAge": 6,
+  "maxAge": 12
+}
+
+###
+
+# ===========================
+# FORMATIONS
+# ===========================
+
+### Liste des formations
+GET {{host}}/formations?page=1&limit=10
+Authorization: Bearer {{token}}
+
+###
+
+### Créer une formation (admin)
+POST {{host}}/formations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Algèbre de base",
+  "description": "Introduction à l'algèbre",
+  "categoryId": "REMPLACER_PAR_UUID_CATEGORIE",
+  "status": "DRAFT"
+}
+
+###
+
+# ===========================
+# MODULES
+# ===========================
+
+### Liste des modules
+GET {{host}}/modules?page=1&limit=10
+Authorization: Bearer {{token}}
+
+###
+
+### Créer un module (admin)
+POST {{host}}/modules
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Chapitre 1 : Les équations",
+  "description": "Résolution d'équations du premier degré",
+  "formationId": "REMPLACER_PAR_UUID_FORMATION",
+  "order": 1
+}
+
+###
+
+# ===========================
+# ENROLLMENTS
+# ===========================
+
+### S'inscrire à une formation (learner)
+POST {{host}}/enrollments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "formationId": "REMPLACER_PAR_UUID_FORMATION"
+}
+
+###
+
+### Mettre à jour la progression
+PATCH {{host}}/enrollments/REMPLACER_PAR_UUID/progress
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "progressPercentage": 50
+}
+
+###
+
+# ===========================
+# EVALUATIONS
+# ===========================
+
+### Créer une évaluation (admin)
+POST {{host}}/evaluations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Quiz chapitre 1",
+  "moduleId": "REMPLACER_PAR_UUID_MODULE",
+  "passingScore": 70
+}
+
+###
+
+# ===========================
+# QUESTIONS
+# ===========================
+
+### Créer une question avec réponses (admin)
+POST {{host}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "questionText": "Quelle est la solution de 2x = 4 ?",
+  "evaluationId": "REMPLACER_PAR_UUID_EVALUATION",
+  "answers": [
+    { "answerText": "x = 1", "isCorrect": false },
+    { "answerText": "x = 2", "isCorrect": true },
+    { "answerText": "x = 3", "isCorrect": false },
+    { "answerText": "x = 4", "isCorrect": false }
+  ]
+}
+
+###
+
+# ===========================
+# ATTEMPTS
+# ===========================
+
+### Soumettre une tentative (learner)
+POST {{host}}/attempts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "evaluationId": "REMPLACER_PAR_UUID_EVALUATION",
+  "answers": [
+    { "questionId": "REMPLACER_PAR_UUID_QUESTION", "answerId": "REMPLACER_PAR_UUID_REPONSE" }
+  ]
+}
+
+###
+
+# ===========================
+# CERTIFICATES
+# ===========================
+
+### Vérifier un certificat (public)
+GET {{host}}/certificates/verify/WIN-2026-XXXXX
+
+###

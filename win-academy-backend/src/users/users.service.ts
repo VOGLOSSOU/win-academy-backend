@@ -16,9 +16,7 @@ export class UsersService {
         lastName: createUserDto.lastName,
         email: createUserDto.email,
         passwordHash: hashedPassword,
-        dateOfBirth: createUserDto.dateOfBirth
-          ? new Date(createUserDto.dateOfBirth)
-          : undefined,
+        dateOfBirth: new Date(createUserDto.dateOfBirth),
         sex: createUserDto.sex,
         communeId: createUserDto.communeId,
         role: createUserDto.role,

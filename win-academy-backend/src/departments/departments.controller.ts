@@ -8,12 +8,12 @@ import { Roles, UserRole } from '../common/decorators/roles.decorator';
 
 @ApiTags('Departments')
 @Controller('departments')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Create department' })
   create(@Body() createDepartmentDto: CreateDepartmentDto) {
@@ -33,6 +33,8 @@ export class DepartmentsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Update department' })
   update(@Param('id') id: string, @Body() updateDepartmentDto: UpdateDepartmentDto) {
@@ -40,6 +42,8 @@ export class DepartmentsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Delete department' })
   remove(@Param('id') id: string) {

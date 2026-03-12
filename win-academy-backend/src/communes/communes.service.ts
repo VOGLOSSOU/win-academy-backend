@@ -23,7 +23,7 @@ export class CommunesService {
       this.prisma.commune.findMany({
         skip,
         take: limit,
-        include: { department: true, users: true },
+        include: { department: true },
       }),
       this.prisma.commune.count(),
     ]);
@@ -33,7 +33,7 @@ export class CommunesService {
   async findOne(id: string) {
     const commune = await this.prisma.commune.findUnique({
       where: { id },
-      include: { department: true, users: true },
+      include: { department: true },
     });
     if (!commune) throw new NotFoundException(`Commune ${id} not found`);
     return commune;
@@ -45,8 +45,9 @@ export class CommunesService {
   }
 
   async remove(id: string) {
-    const commune = await this.findOne(id);
-    if (commune.users.length > 0) {
+    await this.findOne(id);
+    const usersCount = await this.prisma.user.count({ where: { communeId: id } });
+    if (usersCount > 0) {
       throw new ConflictException('Cannot delete commune with users');
     }
     await this.prisma.commune.delete({ where: { id } });

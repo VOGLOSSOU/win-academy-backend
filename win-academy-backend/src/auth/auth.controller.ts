@@ -5,6 +5,7 @@ import {
   UseGuards,
   Get,
   Request,
+  HttpCode,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -32,6 +33,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Login user' })
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
@@ -41,6 +43,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('refresh')
+  @HttpCode(200)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
@@ -54,7 +57,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({ status: 200, description: 'User profile' })
-  async getProfile(@CurrentUser() user: any) {
-    return user;
+  async getProfile(@CurrentUser('id') userId: string) {
+    return this.authService.getMe(userId);
   }
 }
