@@ -16,6 +16,7 @@ async function bootstrap() {
     'https://www.wurami.org',
     'http://wurami.org',
     'http://www.wurami.org',
+    'https://win-academy-admin-frontend.vercel.app',
     'http://localhost:3000',
     'http://localhost:3001',
   ];
