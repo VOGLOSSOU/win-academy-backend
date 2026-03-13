@@ -15,18 +15,19 @@ Authorization: Bearer <accessToken>
 Voici l'ordre logique des appels API selon les écrans de l'application :
 
 ```
-1. [Page catalogue]      GET /categories          → liste les catégories avec leurs formations
-2. [Page catalogue]      GET /formations          → liste toutes les formations (avec modules et inscrits)
-3. [Page formation]      GET /formations/:id      → détail d'une formation (plan du cours, éval)
-4. [Bouton "S'inscrire"] POST /auth/login         → récupérer le token (si pas connecté)
-5. [Bouton "S'inscrire"] POST /enrollments        → s'inscrire à la formation
-6. [Espace apprenant]    GET /enrollments/mine    → mes formations en cours
-7. [Lecteur de cours]    GET /contents/:id        → lire un contenu (1 appel par leçon)
-8. [Fin de formation]    GET /evaluations/:id     → charger le quiz
-9. [Fin de formation]    POST /attempts           → soumettre les réponses
-10. [Page résultat]      GET /attempts/:id        → afficher le score
-11. [Page certificats]   GET /certificates/mine   → voir mes certificats obtenus
-12. [Page vérification]  GET /certificates/verify/:code → vérifier un certificat (public)
+1.  [Page catalogue]      GET /categories              → liste les catégories avec leurs formations
+2.  [Page catalogue]      GET /formations              → liste toutes les formations
+3.  [Page formation]      GET /formations/:id          → détail d'une formation (plan du cours, éval)
+4.  [Bouton "S'inscrire"] POST /auth/login             → récupérer le token (si pas connecté)
+5.  [Bouton "S'inscrire"] POST /enrollments            → s'inscrire à la formation
+6.  [Page dashboard]      GET /auth/dashboard          → ⭐ toutes les infos du user en un seul appel
+7.  [Lecteur de cours]    GET /contents/:id            → lire un contenu (1 appel par leçon)
+8.  [Fin de leçon]        PATCH /enrollments/:id/progress → mettre à jour la progression
+9.  [Fin de formation]    GET /evaluations/:id         → charger le quiz
+10. [Fin de formation]    POST /attempts               → soumettre les réponses
+11. [Page résultat]       (utiliser la réponse du POST /attempts directement)
+12. [Page certificats]    GET /certificates/mine       → voir mes certificats obtenus
+13. [Page vérification]   GET /certificates/verify/:code → vérifier un certificat (public)
 ```
 
 ---
@@ -99,6 +100,72 @@ Voici l'ordre logique des appels API selon les écrans de l'application :
 
 **Erreurs :**
 - `401` — Token expiré ou invalide → rediriger vers la page de login
+
+---
+
+### GET `/auth/dashboard` — Dashboard complet de l'apprenant
+**Accès :** token valide | **Status :** ✅ 200 OK
+
+> **Route centrale du tableau de bord.** Un seul appel retourne tout ce dont la page dashboard a besoin : profil, formations en cours avec progression, et certificats obtenus. Appeler juste après le login pour alimenter tout le tableau de bord.
+
+**Réponse 200 :**
+```json
+{
+  "id": "e057f4b7-ba5b-4440-8e8b-d5146144c7ae",
+  "firstName": "Nathan",
+  "lastName": "Voglossou",
+  "email": "n969601@gmail.com",
+  "dateOfBirth": "2004-07-16T00:00:00.000Z",
+  "sex": "M",
+  "role": "LEARNER",
+  "status": "ACTIVE",
+  "createdAt": "2026-03-12T08:55:09.265Z",
+  "enrollments": [
+    {
+      "id": "00fb2446-123b-41ab-9315-e30e42525237",
+      "formationId": "b9b74424-...",
+      "progressPercentage": 50,
+      "status": "IN_PROGRESS",
+      "enrolledAt": "2026-03-13T09:35:29.580Z",
+      "formation": {
+        "id": "b9b74424-...",
+        "title": "English Fundamentals That Open Doors",
+        "shortDescription": "un cours d'anglais professionnel",
+        "level": "DEBUTANT",
+        "duration": 30,
+        "price": 0,
+        "image": null,
+        "category": { "id": "...", "name": "Anglais" },
+        "modules": [
+          { "id": "e7224993-...", "title": "MODULE 1 — L'alphabet et les sons de l'anglais", "order": 1 },
+          { "id": "468d2e6d-...", "title": "Se présenter et saluer", "order": 2 }
+        ],
+        "evaluation": {
+          "id": "22ed8eaf-0302-41bf-8d56-1f4615538d90",
+          "passingScore": 70,
+          "maxAttempts": 3,
+          "timeLimit": 20
+        },
+        "_count": { "enrollments": 1 }
+      }
+    }
+  ],
+  "certificates": [
+    {
+      "id": "292326bf-ea6e-4d8a-81c2-eb497ef245ba",
+      "uniqueCode": "WA-1773395650519-23JDWUFH0",
+      "issuedAt": "2026-03-13T09:54:10.522Z",
+      "qrCodeUrl": null,
+      "formation": { "id": "b9b74424-...", "title": "English Fundamentals That Open Doors", "level": "DEBUTANT", "price": 0 }
+    }
+  ]
+}
+```
+
+> `enrollments` est trié par date d'inscription décroissante (la plus récente en premier). `certificates` est trié par date d'émission décroissante. `enrollments[].formation.evaluation.id` est l'UUID à passer à `GET /evaluations/:id` pour charger le quiz.
+
+**Erreurs :**
+- `401` — Token expiré ou invalide
 
 ---
 
