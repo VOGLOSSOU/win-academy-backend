@@ -165,7 +165,7 @@ model Content {
   type      ContentType
   title     String
   url       String?
-  body      String?     // Pour contenu TEXT stocké en base
+  body      String?     @db.Text // Pour contenu TEXT stocké en base
   order     Int
   moduleId  String
   createdAt DateTime    @default(now())
