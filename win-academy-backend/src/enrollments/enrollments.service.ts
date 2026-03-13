@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { calculateAge, isAgeInRange } from '../common/utils/age.utils';
 
@@ -178,8 +178,11 @@ export class EnrollmentsService {
     });
   }
 
-  async remove(id: string) {
-    await this.findOne(id);
+  async remove(id: string, userId: string, userRole: string) {
+    const enrollment = await this.findOne(id);
+    if (userRole !== 'ADMIN' && userRole !== 'SUPER_ADMIN' && enrollment.userId !== userId) {
+      throw new ForbiddenException('Vous n\'êtes pas autorisé à supprimer cette inscription');
+    }
     await this.prisma.enrollment.delete({ where: { id } });
     return { message: 'Inscription supprimée' };
   }

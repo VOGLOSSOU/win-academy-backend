@@ -122,7 +122,7 @@ export class AttemptsService {
       this.prisma.attempt.findMany({ 
         skip, 
         take: limit, 
-        include: { user: true, evaluation: true } 
+        include: { user: { select: { id: true, firstName: true, lastName: true, email: true, role: true } }, evaluation: true }
       }),
       this.prisma.attempt.count(),
     ]);

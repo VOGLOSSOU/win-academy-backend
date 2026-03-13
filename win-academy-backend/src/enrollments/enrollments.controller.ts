@@ -40,8 +40,11 @@ export class EnrollmentsController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
-  remove(@Param('id') id: string) {
-    return this.enrollmentsService.remove(id);
+  remove(
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string,
+    @CurrentUser('role') userRole: string,
+  ) {
+    return this.enrollmentsService.remove(id, userId, userRole);
   }
 }
