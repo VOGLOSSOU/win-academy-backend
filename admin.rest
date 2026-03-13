@@ -302,3 +302,5 @@ DELETE {{host}}/questions/e758d0f0-1d2a-4a6e-8f99-bb1c751b8e91
 Authorization: Bearer {{token}}
 
 ###
+
+GET http://localhost:3000/health

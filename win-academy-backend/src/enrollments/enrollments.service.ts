@@ -44,7 +44,7 @@ export class EnrollmentsService {
     }
     
     // Créer l'inscription avec progression à 0
-    return this.prisma.enrollment.create({ 
+    const enrollment = await this.prisma.enrollment.create({
       data: {
         userId: data.userId,
         formationId: data.formationId,
@@ -53,6 +53,21 @@ export class EnrollmentsService {
       },
       include: { user: true, formation: true },
     });
+    const { passwordHash, ...safeUser } = enrollment.user;
+    return { ...enrollment, user: safeUser };
+  }
+
+  async findMine(userId: string) {
+    const enrollments = await this.prisma.enrollment.findMany({
+      where: { userId },
+      include: {
+        formation: {
+          include: { category: true, modules: { orderBy: { order: 'asc' } } },
+        },
+      },
+      orderBy: { enrolledAt: 'desc' },
+    });
+    return enrollments;
   }
 
   async findAll(page = 1, limit = 10) {
@@ -73,9 +88,21 @@ export class EnrollmentsService {
   }
 
   async findOne(id: string) {
-    const enrollment = await this.prisma.enrollment.findUnique({ 
-      where: { id }, 
-      include: { user: true, formation: { include: { modules: { include: { contents: true } } } } } 
+    const enrollment = await this.prisma.enrollment.findUnique({
+      where: { id },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, email: true, role: true, status: true, createdAt: true } },
+        formation: {
+          include: {
+            modules: {
+              orderBy: { order: 'asc' },
+              include: {
+                contents: { select: { id: true, type: true, title: true, order: true, moduleId: true, createdAt: true } },
+              },
+            },
+          },
+        },
+      },
     });
     if (!enrollment) throw new NotFoundException(`Inscription ${id} non trouvée`);
     return enrollment;

@@ -1,0 +1,189 @@
+# WIN ACADEMY — Test API Flux Apprenant
+# Base URL : changer @host selon l'environnement
+
+@host = http://localhost:3000
+# @host = https://win-academy-backend.onrender.com
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlMDU3ZjRiNy1iYTViLTQ0NDAtOGU4Yi1kNTE0NjE0NGM3YWUiLCJlbWFpbCI6Im45Njk2MDFAZ21haWwuY29tIiwicm9sZSI6IkxFQVJORVIiLCJpYXQiOjE3NzMzOTM2MTMsImV4cCI6MTc3MzM5NzIxM30.jiknF4AlcCygsE4W50w-0jCn-ZwNbTOuOKU5jmEJZyA
+
+# ===========================
+# 1. AUTHENTIFICATION
+# ===========================
+
+### Connexion apprenant
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "n969601@gmail.com",
+  "password": "N@than16"
+}
+
+###
+
+### Mon profil
+GET {{host}}/auth/me
+Authorization: Bearer {{token}}
+
+###
+
+### Dashboard apprenant (toutes les infos d'un coup)
+GET {{host}}/auth/dashboard
+Authorization: Bearer {{token}}
+
+###
+
+# ===========================
+# 2. CATÉGORIES (public — sans token)
+# ===========================
+
+### Liste des catégories
+GET {{host}}/categories?page=1&limit=20
+
+###
+
+### Une catégorie par ID
+GET {{host}}/categories/0db2b6eb-a655-48a9-b9fd-8fc26e9cee66
+
+###
+
+# ===========================
+# 3. FORMATIONS (public — sans token)
+# ===========================
+
+### Liste des formations
+GET {{host}}/formations?page=1&limit=20
+
+###
+
+### Une formation par ID
+GET {{host}}/formations/b9b74424-d3c7-4cbb-85b0-ba52f12267de
+
+###
+
+
+### Modules d'une formation (titres et ordre)
+GET {{host}}/formations/b9b74424-d3c7-4cbb-85b0-ba52f12267de/modules
+
+###
+
+# ===========================
+# 4. MODULES (public — sans token)
+# ===========================
+
+### Un module par ID (titre, description, ordre)
+GET {{host}}/modules/05be0ac3-4565-4af3-8989-2a76a092fbdb
+
+###
+
+# ===========================
+# 5. INSCRIPTIONS
+# ===========================
+
+### S'inscrire à une formation
+POST {{host}}/enrollments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "formationId": "b9b74424-d3c7-4cbb-85b0-ba52f12267de"
+}
+
+###
+
+### Mes inscriptions
+GET {{host}}/enrollments/mine
+Authorization: Bearer {{token}}
+
+###
+
+### Une inscription par ID
+GET {{host}}/enrollments/00fb2446-123b-41ab-9315-e30e42525237
+Authorization: Bearer {{token}}
+
+###
+
+
+### Mettre à jour ma progression
+PATCH {{host}}/enrollments/00fb2446-123b-41ab-9315-e30e42525237/progress
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "progressPercentage": 50
+}
+
+###
+
+# ===========================
+# 6. CONTENUS (token + inscription requis)
+# ===========================
+
+### Lire un contenu (vidéo / PDF / texte)
+GET {{host}}/contents/7b50e542-6082-49c9-bb33-74c058b94506
+Authorization: Bearer {{token}}
+
+###
+
+# ===========================
+# 7. ÉVALUATION (token requis — tout utilisateur connecté)
+# ===========================
+
+### Voir l'évaluation d'une formation (avec questions et réponses)
+GET {{host}}/evaluations/22ed8eaf-0302-41bf-8d56-1f4615538d90
+Authorization: Bearer {{token}}
+
+###
+
+# ===========================
+# 8. TENTATIVES D'ÉVALUATION
+# ===========================
+
+### Soumettre une tentative (toutes les bonnes réponses = 100%)
+POST {{host}}/attempts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "evaluationId": "22ed8eaf-0302-41bf-8d56-1f4615538d90",
+  "answers": [
+    { "questionId": "e0320210-464d-404c-9c29-2cba8429816e", "answerId": "ca0596e6-4f1b-4c2a-a172-9345d595b4c5" },
+    { "questionId": "0c4bb6ea-34d3-4494-8959-c2260a273c43", "answerId": "98834690-8f7b-40c8-82e7-a5d71338094b" },
+    { "questionId": "feab5845-f2d2-48fd-bd8d-282d6e602ce9", "answerId": "6a744fd4-cf72-47f3-bdf9-9b066e3d3027" },
+    { "questionId": "0e403c29-3366-4184-bb7c-2766f42a0192", "answerId": "f65f1baa-c4fa-4f74-93f3-25edc8602513" },
+    { "questionId": "4af2b2c6-d26c-450b-8e7a-25ef6205174e", "answerId": "f059fd66-e69b-4546-bc44-be49884e01d6" },
+    { "questionId": "6b8c2acf-f40b-4359-ad08-ad94cdca6060", "answerId": "dc711160-1f91-4096-b937-887cf3d56ca6" },
+    { "questionId": "ab13f903-df4b-4497-92a0-d9713f4be7c3", "answerId": "1431b59f-a3f6-4adc-9621-4cb3c5ee6f62" },
+    { "questionId": "4396a5f4-2150-417d-a1eb-bc8c82fa214b", "answerId": "e9404892-57f0-4892-97bf-d356bcf64119" },
+    { "questionId": "7e364ec5-887b-4078-90cb-3443dbb38c57", "answerId": "49f915bb-3883-4a53-9682-ada012993ffe" },
+    { "questionId": "fa5c894b-a288-456c-8bb5-dc608b1f3e0d", "answerId": "520ec94e-c67f-4ec5-ba34-314b34aa0633" }
+  ]
+}
+
+###
+
+### Voir le résultat d'une tentative
+GET {{host}}/attempts/bb391795-9a96-4014-9283-78a6ec93fcee
+Authorization: Bearer {{token}}
+
+###
+
+# ===========================
+# 9. CERTIFICATS
+# ===========================
+
+### Mes certificats (récupère UUID et uniqueCode)
+GET {{host}}/certificates/mine
+Authorization: Bearer {{token}}
+
+###
+
+### Vérifier un certificat par son code unique (public — sans token)
+GET {{host}}/certificates/verify/WA-1773395650519-23JDWUFH0
+
+###
+
+### Voir un certificat par ID
+GET {{host}}/certificates/292326bf-ea6e-4d8a-81c2-eb497ef245ba
+Authorization: Bearer {{token}}
+
+###

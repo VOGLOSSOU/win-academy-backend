@@ -60,4 +60,13 @@ export class AuthController {
   async getProfile(@CurrentUser('id') userId: string) {
     return this.authService.getMe(userId);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('dashboard')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get full dashboard data for the logged-in user' })
+  @ApiResponse({ status: 200, description: 'User dashboard' })
+  async getDashboard(@CurrentUser('id') userId: string) {
+    return this.authService.getDashboard(userId);
+  }
 }

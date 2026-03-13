@@ -14,12 +14,17 @@ export class EnrollmentsController {
   constructor(private readonly enrollmentsService: EnrollmentsService) {}
 
   @Post()
-  @Roles(UserRole.LEARNER)
   create(@Body() data: any, @CurrentUser('id') userId: string) {
     return this.enrollmentsService.create({ ...data, userId });
   }
 
+  @Get('mine')
+  findMine(@CurrentUser('id') userId: string) {
+    return this.enrollmentsService.findMine(userId);
+  }
+
   @Get()
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
     return this.enrollmentsService.findAll(+page, +limit);
   }
@@ -30,7 +35,6 @@ export class EnrollmentsController {
   }
 
   @Patch(':id/progress')
-  @Roles(UserRole.LEARNER)
   updateProgress(@Param('id') id: string, @Body() body: { progressPercentage: number }) {
     return this.enrollmentsService.updateProgress(id, body.progressPercentage);
   }

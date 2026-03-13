@@ -50,10 +50,24 @@ export class CertificatesService {
     return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
+  async findMine(userId: string) {
+    return this.prisma.certificate.findMany({
+      where: { userId },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, email: true, role: true } },
+        formation: true,
+      },
+      orderBy: { issuedAt: 'desc' },
+    });
+  }
+
   async findOne(id: string) {
     const certificate = await this.prisma.certificate.findUnique({
       where: { id },
-      include: { user: true, formation: true },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, email: true, role: true } },
+        formation: true,
+      },
     });
     if (!certificate) throw new NotFoundException(`Certificate ${id} not found`);
     return certificate;
@@ -62,7 +76,10 @@ export class CertificatesService {
   async verify(uniqueCode: string) {
     const certificate = await this.prisma.certificate.findUnique({
       where: { uniqueCode },
-      include: { user: true, formation: true },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, email: true, role: true } },
+        formation: true,
+      },
     });
     if (!certificate) throw new NotFoundException('Certificate not found');
     return certificate;

@@ -27,15 +27,22 @@ export class CertificatesController {
     return this.certificatesService.findAll(+page, +limit);
   }
 
-  @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get('mine')
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  findOne(@Param('id') id: string) {
-    return this.certificatesService.findOne(id);
+  findMine(@CurrentUser('id') userId: string) {
+    return this.certificatesService.findMine(userId);
   }
 
   @Get('verify/:uniqueCode')
   verify(@Param('uniqueCode') uniqueCode: string) {
     return this.certificatesService.verify(uniqueCode);
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  findOne(@Param('id') id: string) {
+    return this.certificatesService.findOne(id);
   }
 }

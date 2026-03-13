@@ -19,7 +19,13 @@ export class ModulesService {
   }
 
   async findOne(id: string) {
-    const module = await this.prisma.module.findUnique({ where: { id }, include: { contents: true, formation: true } });
+    const module = await this.prisma.module.findUnique({
+      where: { id },
+      include: {
+        contents: { select: { id: true, type: true, title: true, order: true, moduleId: true, createdAt: true } },
+        formation: true,
+      },
+    });
     if (!module) throw new NotFoundException(`Module ${id} not found`);
     return module;
   }

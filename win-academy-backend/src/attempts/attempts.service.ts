@@ -79,7 +79,7 @@ export class AttemptsService {
       },
       include: {
         evaluation: true,
-        user: true,
+        user: { select: { id: true, firstName: true, lastName: true, email: true, role: true } },
       },
     });
 
@@ -132,7 +132,10 @@ export class AttemptsService {
   async findOne(id: string) {
     const attempt = await this.prisma.attempt.findUnique({
       where: { id },
-      include: { user: true, evaluation: true },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, email: true, role: true } },
+        evaluation: true,
+      },
     });
     if (!attempt) throw new NotFoundException(`Tentative ${id} non trouvée`);
     return attempt;
